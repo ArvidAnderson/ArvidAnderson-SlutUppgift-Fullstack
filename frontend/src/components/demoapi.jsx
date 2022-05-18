@@ -1,5 +1,8 @@
 import axios from "axios"
 import { useState } from "react"
+import Graphical from "./graphical"
+import Raw from "./raw"
+import Tabs from "./tabs"
 
 export default function DemoApi() {
   //Predefined Values & User Interactable States
@@ -120,40 +123,31 @@ export default function DemoApi() {
         {/* Results */}
         <div className="grid flex-grow card bg-base-300 rounded-box p-3">
           {/* Tabs */}
-          <div className="tabs tabs-boxed mb-2">
-            {tabs.map((tab) => (
-              <button key={tabs.indexOf(tab)} onClick={() => setActiveTab(tab)} className={activeTab === tab ? "tab tab-lg tab-active" : "tab tab-lg"}>{tab}</button> 
-            ))}
-          </div>
+          <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="flex h-72">
+            {/* Make sure a fetch has been done */}
             {Object.keys(fetchRelated.data).length == 0  ? (
               <div className="flex justify-center items-center w-full">
-                <h1 className="text-xl text-semibold">Perform a request to display data.</h1>
+                <h1 className="text-xl text-semibold text-center">Perform a request to display data.</h1>
               </div>
             ) : (
               <>
-                {/* Raw */}
-                {activeTab === tabs[0] && (
-                  <div className="flex w-full h-full place-content-center place-items-center">
-                    <textarea
-                      readOnly
-                      value={JSON.stringify(fetchRelated.data)} 
-                      className="resize-none textarea textarea-secondary w-full h-full"
-                      placeholder="{ id: 1, name: Arvid Anderson, age: 19 }">
-                      
-                    </textarea>
+                {!fetchRelated.loading ? (
+                  <div className="flex justify-center items-center w-full">
+                    <progress class="progress w-96"></progress>
                   </div>
-                )}
-                {/* Graphical */}
-                {activeTab === tabs[1] && (
-                  <div className="flex w-full h-full">
-                    <div className="card bg-secondary w-full h-full shadow-xl">
-                      <div className="card-body">
-                        <h2 className="card-title">{fetchRelated.data.title}</h2>
-                        <p>Todo Description</p>
-                      </div>
-                    </div>
-                  </div>
+                ) : (
+                  <div className="flex w-full">
+                  {/* Raw */}
+                  {activeTab === tabs[0] && (
+                    <Raw data={fetchRelated.data}/>
+                  )}
+
+                  {/* Graphical */}
+                  {activeTab === tabs[1] && (
+                    <Graphical data={fetchRelated.data}/>
+                  )}
+                </div>
                 )}
               </>
             )}
