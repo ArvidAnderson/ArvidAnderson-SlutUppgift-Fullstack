@@ -1,3 +1,4 @@
+import DemoApi from "../components/demoapi";
 import Hero from "../components/hero";
 
 export default function Home() {
@@ -14,6 +15,9 @@ export default function Home() {
       </section>
 
       {/* Demo api section */}
+      <section className="DemoApiSection">
+        <DemoApi/>
+      </section>
     </div>
   )
 }
