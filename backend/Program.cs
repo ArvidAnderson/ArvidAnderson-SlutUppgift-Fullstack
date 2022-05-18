@@ -8,8 +8,7 @@ var app = builder.Build();
 app.UseCors(builder => builder
  .AllowAnyOrigin()
  .AllowAnyMethod()
- .AllowAnyHeader()
- .AllowCredentials());
+ .AllowAnyHeader());
 
 app.MapGet("/", async (TodoService todoService) => await todoService.Get());
 

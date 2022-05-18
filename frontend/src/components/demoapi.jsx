@@ -25,16 +25,12 @@ export default function DemoApi() {
       scope: "Resource"
     },
     {
-      method: "PATCH",
-      scope: "Resource"
-    },
-    {
       method: "DELETE",
       scope: "Resource"
     }
   ]
 
-  const [ pathParam, setPathParam ] = useState(null)
+  const [ pathParam, setPathParam ] = useState("")
 
   const [ selectedMethod, setSelectedMethod ] = useState(methods[0])
   
@@ -45,6 +41,8 @@ export default function DemoApi() {
 
   //API Related States
   const [ fetchRelated, setfetchRelated ] = useState({
+    error: false,
+    errorMsg: "",
     loading: null,
     status: 0,
     data: {},
@@ -69,28 +67,31 @@ export default function DemoApi() {
 
   //Calling the api.....
   const onRequestSubmit = async () => {
-    setfetchRelated({...fetchRelated, loading: true})
+    setfetchRelated({...fetchRelated, loading: true, error: false})
     console.log("Submitting request to the api...")
-    let apiUrl = "https://jsonplaceholder.typicode.com/todos"
-    let pathParameter = 3
+    let apiUrl = process.env.NEXT_PUBLIC_API_URL
+    let pathParameter = pathParam
     let method = selectedMethod.method
     let scope = selectedMethod.scope
-    let json = JSON.stringify(inputJson)
-    console.log("Data:", {method: method, json: json})
-
+    let json = inputJson
     //Decide scope for API URL
     apiUrl = decideScopeForRequest(apiUrl, scope, pathParameter)
-    console.log(apiUrl)
-
     //Perfrom request
-    let response = await axios({
-      method: method.toLowerCase(),
-      url: apiUrl,
-      data: json
-    })
-
-    await timeout(2000)
-    setfetchRelated({...fetchRelated, loading: false, status: response.status, data: response.data, method: method.toLowerCase()})
+    try {
+      let response = await axios({
+        method: method.toLowerCase(),
+        url: apiUrl,
+        data: json,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      await timeout(2000)
+      setfetchRelated({...fetchRelated, error: false, errorMsg: "", loading: false, status: response.status, data: response.data, method: method.toLowerCase()})
+    } catch(err) {
+      console.log(err.response.status)
+      setfetchRelated({...fetchRelated, status: err.response.status, error: true, errorMsg: err.message, loading: false})
+    }
   }
 
   return (
@@ -102,8 +103,8 @@ export default function DemoApi() {
           <div className="w-full">
             {/* API URL Placeholder */}
             <div className="flex w-full">
-              <input readOnly value={process.env.NEXT_PUBLIC_API_URL + "/"} type="text" placeholder={process.env.NEXT_PUBLIC_API_URL} className="input focus:outline-0 input-bordered pr-0 border-r-0 rounded-r-none input-accent mr-[-1.6rem]" />
-              <input value={pathParam} type="text" placeholder="path parameter" className="input input-bordered border-l-0 rounded-l-none pl-0 input-accent w-full focus:outline-none" />
+              <input readOnly value={process.env.NEXT_PUBLIC_API_URL + "/"} type="text" placeholder={process.env.NEXT_PUBLIC_API_URL} className="input focus:outline-0 input-bordered pr-0 border-r-0 rounded-r-none input-accent mr-[-1.2rem]" />
+              <input onChange={(e) => setPathParam(e.target.value)} value={pathParam} type="text" placeholder="path parameter" className="input input-bordered border-l-0 rounded-l-none pl-0 input-accent w-full focus:outline-none" />
             </div>
             {/* Select method*/}
             <div className="flex w-full mt-3">
@@ -127,8 +128,8 @@ export default function DemoApi() {
             <div className="mt-3">
               {fetchRelated.loading && (<button class="btn loading w-full md:w-52">Sending Request</button>)}
               {!fetchRelated.loading && (
-                <button onClick={onRequestSubmit} className="btn btn-success w-full flex md:w-52">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                <button onClick={() => onRequestSubmit()} className="btn btn-success w-full flex md:w-52">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                   Send Request
                 </button>
               )}
@@ -145,30 +146,36 @@ export default function DemoApi() {
           <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="flex h-72">
             {/* Make sure a fetch has been done */}
-            {Object.keys(fetchRelated.data).length == 0  ? (
+            {fetchRelated.status === 0 && (
               <div className="flex justify-center items-center w-full">
                 <h1 className="text-xl text-semibold text-center">Perform a request to display data.</h1>
               </div>
-            ) : (
+            )}
+            {fetchRelated.error && (
+              <div className="flex justify-center items-center w-full bg-error">
+                <h1 className="text-xl text-semibold text-center">{fetchRelated.errorMsg}</h1>
+              </div>
+            )}
+            {fetchRelated.status !== 0 && !fetchRelated.error && (
               <>
-                {fetchRelated.loading ? (
-                  <div className="flex justify-center items-center w-full">
-                    <progress class="progress w-96"></progress>
-                  </div>
-                ) : (
-                  <div className="flex w-full">
-                  {/* Raw */}
-                  {activeTab === tabs[0] && (
-                    <Raw data={fetchRelated.data}/>
-                  )}
-
-                  {/* Graphical */}
-                  {activeTab === tabs[1] && (
-                    <Graphical data={fetchRelated.data} method={fetchRelated.method}/>
-                  )}
+              {fetchRelated.loading ? (
+                <div className="flex justify-center items-center w-full">
+                  <progress class="progress w-96"></progress>
                 </div>
+              ) : (
+                <div className="flex w-full">
+                {/* Raw */}
+                {activeTab === tabs[0] && (
+                  <Raw data={fetchRelated.data}/>
                 )}
-              </>
+
+                {/* Graphical */}
+                {activeTab === tabs[1] && (
+                  <Graphical data={fetchRelated.data} method={fetchRelated.method}/>
+                )}
+              </div>
+              )}
+            </>
             )}
           </div>
         </div>

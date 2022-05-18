@@ -9,7 +9,7 @@ export default function Graphical({ data, method }) {
       {data.length === undefined && method === "get" && (
         <div className="card bg-secondary w-full h-full shadow-xl">
           <div className="card-body">
-            <h2 className="card-title">{data.title}</h2>
+            <h2 className="card-title">{data.name}</h2>
             <p>{data.description}</p>
           </div>
         </div>
