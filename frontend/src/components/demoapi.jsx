@@ -41,9 +41,10 @@ export default function DemoApi() {
 
   //API Related States
   const [ fetchRelated, setfetchRelated ] = useState({
-    loading: false,
+    loading: null,
     status: 0,
-    data: {}
+    data: {},
+    method: null
   })
 
   const decideScopeForRequest = (apiUrl, scope, pathParameter) => {
@@ -78,7 +79,7 @@ export default function DemoApi() {
       data: json
     })
 
-    setfetchRelated({...fetchRelated, loading: false, status: response.status, data: response.data})
+    setfetchRelated({...fetchRelated, loading: false, status: response.status, data: response.data, method: method.toLowerCase()})
   }
 
   return (
@@ -132,7 +133,7 @@ export default function DemoApi() {
               </div>
             ) : (
               <>
-                {!fetchRelated.loading ? (
+                {fetchRelated.loading ? (
                   <div className="flex justify-center items-center w-full">
                     <progress class="progress w-96"></progress>
                   </div>
@@ -145,7 +146,7 @@ export default function DemoApi() {
 
                   {/* Graphical */}
                   {activeTab === tabs[1] && (
-                    <Graphical data={fetchRelated.data}/>
+                    <Graphical data={fetchRelated.data} method={fetchRelated.method}/>
                   )}
                 </div>
                 )}
