@@ -1,7 +1,11 @@
-export default function Navbar({title}) {
+import Link from "next/link"
+
+export default function Navbar({ title }) {
   return (
-    <div className="navbar bg-base-100">
-      <a className="btn btn-ghost normal-case text-xl">{title}</a>
+    <div className="navbar bg-primary">
+      <Link href={"/"}>
+        <a className="btn btn-ghost normal-case text-xl focus:bg-primary-focus text-primary-content">{title}</a>
+      </Link>
     </div>
   )
 }
