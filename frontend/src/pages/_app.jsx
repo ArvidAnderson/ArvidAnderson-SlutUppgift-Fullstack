@@ -1,12 +1,12 @@
 import "../styles/tailwind.css"
 import Navbar from "../components/navbar"
+import Layout from "../components/layout"
 
 function MyApp({ Component, pageProps }) {
   return (
-    <>
-      <Navbar title={process.env.NEXT_PUBLIC_APP_NAME}/>
+    <Layout>
       <Component {...pageProps} />
-    </>
+    </Layout>
   )
 }
 

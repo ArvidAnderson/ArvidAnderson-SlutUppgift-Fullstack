@@ -1,9 +1,9 @@
-import React from 'react'
-
+import Navbar from "./navbar"
 export default function Layout({ children }) {
   return (
-    <div>
-
-    </div>
+    <>
+      <Navbar title={process.env.NEXT_PUBLIC_APP_NAME}/>
+      <main>{children}</main>
+    </>
   )
 }
