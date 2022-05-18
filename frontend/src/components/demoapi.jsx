@@ -1,6 +1,7 @@
 import { useState } from "react"
 
 export default function DemoApi() {
+  //Predefined Values & User Interactable States
   const methods = ["GET | Collection", "GET | Resource", "POST | Collection", "PUT | Resource", "PATCH | Resource", "DELETE | Resource"]
   const [ selectedMethod, setSelectedMethod ] = useState(methods[0])
   
@@ -8,6 +9,19 @@ export default function DemoApi() {
 
   const tabs = ["Raw", "Graphical"]
   const [ activeTab, setActiveTab ] = useState("Raw")
+
+  //API Response
+  const [responseData, setResponseData] = useState([])
+
+  //Calling the api.....
+  const onRequestSubmit = async () => {
+    console.log("Submitting request to the api...")
+    let method = selectedMethod
+    let json = inputJson
+    console.log("Data:", {method: method, json: json})
+
+
+  }
 
   return (
     <div className="min-h-screen bg-base-400 flex justify-center items-center p-10">
@@ -18,7 +32,7 @@ export default function DemoApi() {
           <div className="w-full">
             {/* API URL Placeholder */}
             <div className="flex w-full">
-              <input readOnly value={process.env.NEXT_PUBLIC_API_URL} type="text" placeholder={process.env.NEXT_PUBLIC_API_URL} class="input input-bordered input-accent w-full" />
+              <input readOnly value={process.env.NEXT_PUBLIC_API_URL} type="text" placeholder={process.env.NEXT_PUBLIC_API_URL} className="input input-bordered input-accent w-full" />
             </div>
             {/* Select method*/}
             <div className="flex w-full mt-3">
@@ -40,7 +54,7 @@ export default function DemoApi() {
             </div>
             {/* Send Request Button*/}
             <div className="mt-3">
-              <button className="btn btn-success w-full flex md:w-36">Send Request</button>
+              <button onClick={onRequestSubmit} className="btn btn-success w-full flex md:w-36">Send Request</button>
             </div>
           </div>
         </div> 
