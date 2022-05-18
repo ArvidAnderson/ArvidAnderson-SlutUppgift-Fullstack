@@ -108,7 +108,7 @@ export default function DemoApi() {
               <textarea
                 onChange={(e) => setInputJson(e.target.value)} 
                 className="resize-none textarea textarea-secondary w-full h-full"
-                placeholder="">
+                placeholder="Input json to forward to the api on request">
               </textarea>
             </div>
             {/* Send Request Button*/}
