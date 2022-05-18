@@ -47,6 +47,12 @@ export default function DemoApi() {
     method: null
   })
 
+  //Timeout functioon
+  function timeout(delay) {
+    return new Promise( res => setTimeout(res, delay) );
+  } 
+
+  //Function for deciding scope
   const decideScopeForRequest = (apiUrl, scope, pathParameter) => {
     if(scope == "Resource") {
       apiUrl = apiUrl + "/" + pathParameter
@@ -79,6 +85,7 @@ export default function DemoApi() {
       data: json
     })
 
+    await timeout(2000)
     setfetchRelated({...fetchRelated, loading: false, status: response.status, data: response.data, method: method.toLowerCase()})
   }
 
@@ -113,7 +120,13 @@ export default function DemoApi() {
             </div>
             {/* Send Request Button*/}
             <div className="mt-3">
-              <button onClick={onRequestSubmit} className="btn btn-success w-full flex md:w-36">Send Request</button>
+              {fetchRelated.loading && (<button class="btn loading w-full md:w-52">Sending Request</button>)}
+              {!fetchRelated.loading && (
+                <button onClick={onRequestSubmit} className="btn btn-success w-full flex md:w-52">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                  Send Request
+                </button>
+              )}
             </div>
           </div>
         </div> 
