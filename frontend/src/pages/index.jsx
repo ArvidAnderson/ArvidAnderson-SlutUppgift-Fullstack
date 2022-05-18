@@ -2,6 +2,7 @@ import DemoApi from "../components/demoapi";
 import Hero from "../components/hero";
 
 export default function Home() {
+
   return (
     <div>
 
@@ -10,7 +11,7 @@ export default function Home() {
         <Hero
         title={"Fullstack"}
         description={"this small fullstack web application is created with NextJS + ASP.NET Core."}
-        buttonTitle={"Try it out!"}
+        buttonTitle={"Scroll down!"}
         />
       </section>
 

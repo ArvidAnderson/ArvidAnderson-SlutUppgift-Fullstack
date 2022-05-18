@@ -1,10 +1,11 @@
 import axios from "axios"
-import { useState } from "react"
+import { useState, forwardRef, useRef } from "react"
 import Graphical from "./graphical"
 import Raw from "./raw"
 import Tabs from "./tabs"
 
 export default function DemoApi() {
+
   //Predefined Values & User Interactable States
   const methods = [
     {
@@ -32,6 +33,9 @@ export default function DemoApi() {
       scope: "Resource"
     }
   ]
+
+  const [ pathParam, setPathParam ] = useState(null)
+
   const [ selectedMethod, setSelectedMethod ] = useState(methods[0])
   
   const [ inputJson, setInputJson ] = useState("")
@@ -94,11 +98,12 @@ export default function DemoApi() {
       <div className="flex flex-col w-full lg:flex-row">
 
         {/* Send Requuest */}
-        <div className="grid flex-grow card bg-base-300 rounded-box place-items-center p-3">
+        <div className="grid lg:w-2/4 flex-grow card bg-base-300 rounded-box place-items-center p-3">
           <div className="w-full">
             {/* API URL Placeholder */}
             <div className="flex w-full">
-              <input readOnly value={process.env.NEXT_PUBLIC_API_URL} type="text" placeholder={process.env.NEXT_PUBLIC_API_URL} className="input input-bordered input-accent w-full" />
+              <input readOnly value={process.env.NEXT_PUBLIC_API_URL + "/"} type="text" placeholder={process.env.NEXT_PUBLIC_API_URL} className="input focus:outline-0 input-bordered pr-0 border-r-0 rounded-r-none input-accent mr-[-1.6rem]" />
+              <input value={pathParam} type="text" placeholder="path parameter" className="input input-bordered border-l-0 rounded-l-none pl-0 input-accent w-full focus:outline-none" />
             </div>
             {/* Select method*/}
             <div className="flex w-full mt-3">
@@ -135,7 +140,7 @@ export default function DemoApi() {
         <div className="divider lg:divider-horizontal"></div> 
 
         {/* Results */}
-        <div className="grid flex-grow card bg-base-300 rounded-box p-3">
+        <div className="grid lg:w-2/4 flex-grow card bg-base-300 rounded-box p-3">
           {/* Tabs */}
           <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="flex h-72">
