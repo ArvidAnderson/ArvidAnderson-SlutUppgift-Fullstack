@@ -1,5 +1,7 @@
-export default function Navbar() {
+export default function Navbar({title}) {
   return (
-    <div>Navbar</div>
+    <div className="navbar bg-base-100">
+      <a className="btn btn-ghost normal-case text-xl">{title}</a>
+    </div>
   )
 }
