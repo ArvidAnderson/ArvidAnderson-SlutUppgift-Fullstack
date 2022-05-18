@@ -1,8 +1,34 @@
+import axios from "axios"
 import { useState } from "react"
 
 export default function DemoApi() {
   //Predefined Values & User Interactable States
-  const methods = ["GET | Collection", "GET | Resource", "POST | Collection", "PUT | Resource", "PATCH | Resource", "DELETE | Resource"]
+  const methods = [
+    {
+      method: "GET",
+      scope: "Collection"
+    },
+    {
+      method: "GET",
+      scope: "Resource"
+    },
+    {
+      method: "POST",
+      scope: "Collection"
+    },
+    {
+      method: "PUT",
+      scope: "Resource"
+    },
+    {
+      method: "PATCH",
+      scope: "Resource"
+    },
+    {
+      method: "DELETE",
+      scope: "Resource"
+    }
+  ]
   const [ selectedMethod, setSelectedMethod ] = useState(methods[0])
   
   const [ inputJson, setInputJson ] = useState("")
@@ -10,17 +36,46 @@ export default function DemoApi() {
   const tabs = ["Raw", "Graphical"]
   const [ activeTab, setActiveTab ] = useState("Raw")
 
-  //API Response
-  const [responseData, setResponseData] = useState([])
+  //API Related States
+  const [ fetchRelated, setfetchRelated ] = useState({
+    loading: false,
+    status: 0,
+    data: {}
+  })
+
+  const decideScopeForRequest = (apiUrl, scope, pathParameter) => {
+    if(scope == "Resource") {
+      apiUrl = apiUrl + "/" + pathParameter
+    }
+    if(scope == "Collection") {
+      apiUrl = apiUrl
+    }
+    return apiUrl
+  }
 
   //Calling the api.....
   const onRequestSubmit = async () => {
+    setfetchRelated({...fetchRelated, loading: true})
     console.log("Submitting request to the api...")
-    let method = selectedMethod
-    let json = inputJson
+    let apiUrl = "https://jsonplaceholder.typicode.com/todos"
+    let pathParameter = 3
+    let method = selectedMethod.method
+    let scope = selectedMethod.scope
+    let json = JSON.stringify(inputJson)
     console.log("Data:", {method: method, json: json})
 
+    //Decide scope for API URL
+    apiUrl = decideScopeForRequest(apiUrl, scope, pathParameter)
+    console.log(apiUrl)
 
+    //Perfrom request
+    let response = await axios({
+      method: method.toLowerCase(),
+      url: apiUrl,
+      data: json
+    })
+
+    setfetchRelated({...fetchRelated, loading: false, status: response.status, data: response.data})
   }
 
   return (
@@ -36,10 +91,10 @@ export default function DemoApi() {
             </div>
             {/* Select method*/}
             <div className="flex w-full mt-3">
-              <select onChange={(e) => setSelectedMethod(e.target.value)} defaultValue={"Select request method.."} className="select select-secondary w-full">
+              <select onChange={(e) => setSelectedMethod(methods[e.target.value])} defaultValue={"Select request method.."} className="select select-secondary w-full">
                 <option disabled>Select request method..</option>
                 {methods.map((method) => (
-                  <option key={method} value={method}>{method}</option>
+                  <option key={method.method + method.scope} value={methods.indexOf(method)}>{`${method.method} | ${method.scope}`}</option>
                 ))}
               </select>
             </div>
@@ -71,26 +126,36 @@ export default function DemoApi() {
             ))}
           </div>
           <div className="flex h-72">
-            {/* Raw */}
-            {activeTab === tabs[0] && (
-              <div className="flex w-full h-full place-content-center place-items-center">
-                <textarea 
-                  className="resize-none textarea textarea-secondary w-full h-full"
-                  placeholder="{ id: 1, name: Arvid Anderson, age: 19 }">
-                  
-                </textarea>
+            {Object.keys(fetchRelated.data).length == 0  ? (
+              <div className="flex justify-center items-center w-full">
+                <h1 className="text-xl text-semibold">Perform a request to display data.</h1>
               </div>
-            )}
-            {/* Graphical */}
-            {activeTab === tabs[1] && (
-              <div className="flex w-full h-full">
-                <div class="card bg-secondary w-full h-full shadow-xl">
-                  <div class="card-body">
-                    <h2 class="card-title">Todo Title</h2>
-                    <p>Todo Description</p>
+            ) : (
+              <>
+                {/* Raw */}
+                {activeTab === tabs[0] && (
+                  <div className="flex w-full h-full place-content-center place-items-center">
+                    <textarea
+                      readOnly
+                      value={JSON.stringify(fetchRelated.data)} 
+                      className="resize-none textarea textarea-secondary w-full h-full"
+                      placeholder="{ id: 1, name: Arvid Anderson, age: 19 }">
+                      
+                    </textarea>
                   </div>
-                </div>
-              </div>
+                )}
+                {/* Graphical */}
+                {activeTab === tabs[1] && (
+                  <div className="flex w-full h-full">
+                    <div className="card bg-secondary w-full h-full shadow-xl">
+                      <div className="card-body">
+                        <h2 className="card-title">{fetchRelated.data.title}</h2>
+                        <p>Todo Description</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
